@@ -25,7 +25,12 @@ if(!empty($_POST)) {
   }
 
   if (!isset($_POST['telephone']) || strlen($_POST['telephone']) < 2  || strlen($_POST['telephone']) > 20) {
-    $contenu .= '<div class="bg-danger">Le téléphone est incorrect !</div>';
+    $_POST['telephone'] = htmlspecialchars($_POST['telephone']);
+    if (preg_match("#^0[1-68]([-. ]?[0-9]{2}){4}$#", $_POST['telephone'])) {
+      $contenu .= '<div class="bg-success">Le '. $_POST['telephone'] .' est un numéro <strong>valide</strong> !</div>';
+    }else {
+      $contenu .= '<div class="bg-danger">Le téléphone est incorrect !</div>';
+    }
   }
 
   //email:
@@ -45,7 +50,7 @@ if (empty($contenu)) {
     //on demande donc d'en choisir un autre:
     $contenu .= '<div class="bg-danger">Le pseudo est indisponible. Veuillez en choisir un autre. </div>';
   }else {
-    $_POST['mdp'] = md5($_POST['mdp']); // Si on encrypte un MDP avec cette fonction, il faudra également le faire sur la page de connexion pour comparer 2 MDP cryptés
+    $_POST['mdp'] = sha1($_POST['mdp']); // Si on encrypte un MDP avec cette fonction, il faudra également le faire sur la page de connexion pour comparer 2 MDP cryptés
   //  echo'<pre>'; var_dump($_POST['mdp']); echo'</pre>';
 
     executeRequete("INSERT INTO membre (pseudo, mdp, nom, prenom, telephone, email, civilite, role, date_enregistrement) VALUES(:pseudo, :mdp, :nom, :prenom, :telephone, :email, :civilite, 'user', NOW())",

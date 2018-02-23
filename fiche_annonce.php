@@ -68,43 +68,53 @@ if (isset($_GET['statut_annonce']) && $_GET['statut_annonce'] == 'ajoute') {
 
 //-------------------------------
 
-$requete = executeRequete("SELECT id, titre, photo FROM annonce WHERE categorie = id <> '$annonce[id]' ORDER BY RAND() LIMIT 0,2");
+// $requete = executeRequete("SELECT id, titre, photo FROM annonce WHERE categorie_id = id <> '$annonce[id]' ORDER BY RAND() LIMIT 0,2");
+
+$requete = executeRequete("SELECT id, titre, prix, adresse, code_postal, ville, photo, date_enregistrement FROM annonce WHERE categorie_id = '$annonce[categorie_id]' AND id <> '$annonce[id]' ORDER BY RAND() LIMIT 0,4");
 
 //affichage des annonces suggérés :
 while ($autres_annonces = $requete->fetch(PDO::FETCH_ASSOC)){
   $suggestion .='<div class="col-sm-3">';
+  $suggestion .='<div class="thumbnail">';
     $suggestion .='<a href="?id='. $autres_annonces['id'] .'">
-                  <img src="'. $autres_annonces['photo'] .'" alt="" style="width:100%">
+                  <img src="'. $autres_annonces['photo'] .'" alt="" style="width:50%; height:50%;">
                   </a>';
     $suggestion .='<h4>'. $autres_annonces['titre'] .'</h4>';
+    $suggestion .='<p>'. $autres_annonces['prix'] .'€</p>';
+
+  $suggestion .='</div>';
   $suggestion .='</div>';
 }
-if (internauteEstConnecteEtEstAdmin()) {
-  require_once('admin/adminhaut.inc.php');
-}else {
-  require_once('inc/haut.inc.php');
-}
+// if (internauteEstConnecteEtEstAdmin()) {
+//   require_once('admin/adminhaut.inc.php');
+// }else {
+// }
+require_once('inc/haut.inc.php');
 
 echo $contenu_gauche; //contiendra le pop-up de confirmation d'ajout du panie
+
 
 ?>
 <!-- affichage détaillé du annonce -->
 <div class="row">
   <div class="col-lg-12">
     <h1 class="page-header"><?php echo $titre; ?></h1>
+        <a href="boutique.php?categorie_id=<?php echo $categorie_id; ?>">Retour vers la catégorie sélectionnée</a>
   </div>
   <div class="col-md-8">
     <img class="img-responsive" src="<?php echo $photo;?>" alt="">
   </div>
   <div class="col-md-4">
-    <h3>Description</h3>
-    <p><?php echo $description; ?></p>
+    <h3>Description courte</h3>
+    <p><?php echo $description_courte; ?></p>
     <h3>Détails</h3>
-    <ul>
+    <ul style="list-style-type:none;">
       <li>Catégorie: <?php echo $categorie_id; ?></li>
-      <li>Taille: <?php echo $taille; ?></li>
+      <li>Description longue: <?php echo $description_longue; ?></li>
+      <li>Adresse: <?php echo $adresse.', '.$code_postal.' '.$ville; ?></li>
     </ul>
     <p class="lead">Prix : <?php echo $prix; ?> €</p>
+
 
   </div>
 </div>
