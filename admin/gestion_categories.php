@@ -13,9 +13,9 @@ if (!internauteEstConnecteEtEstAdmin()) {
    if ($resultat->rowCount() == 1) {
      executeRequete("DELETE FROM categorie WHERE id = :id", array(':id' => $_GET['id']));
 
-     $contenu .= '<div class ="bg-success">La catégorie a bien été supprimée ! </div>';
+     $contenu .= '<div class ="bg-success">La catégorie a bien été supprimée ! </div><br>';
    }else {
-     $contenu .= '<div class ="bg-warning">La catégorie n\'existe pas !</div>';
+     $contenu .= '<div class ="bg-warning">La catégorie n\'existe pas !</div><br>';
    }
    $_GET['action'] = 'affichage';
  }
@@ -50,13 +50,14 @@ if(!empty($_POST['id'])){
 
    $resultat = executeRequete("SELECT * FROM categorie");
 
-   $contenu .= 'Nombre de catégories dans la boutique : ' . $resultat->rowCount();
+   $contenu .= '<br>Nombre de catégories dans la boutique : ' . $resultat->rowCount();
 
    $contenu .= '<table class="table">';
      $contenu .= '<tr>';
-       $contenu .= '<th>id</th>';
-       $contenu .= '<th>titre</th>';
-       $contenu .= '<th>mots_cles</th>';
+       $contenu .= '<th>Id</th>';
+       $contenu .= '<th>Titre</th>';
+       $contenu .= '<th>Mots Clés</th>';
+       $contenu .= '<th>Actions</th>';
      $contenu .= '</tr>';
 
    while ($ligne = $resultat->fetch(PDO::FETCH_ASSOC)) {
@@ -73,9 +74,8 @@ if(!empty($_POST['id'])){
 
      }
      $contenu .= '<td>
-                   <a href="?action=modification&id='. $ligne['id'] .'">modifier</a>
-                   /
-                   <a href="?action=suppression&id='. $ligne['id'] .'" onclick="return(confirm(\'Etes-vous sûr de vouloir de supprimer cette catégorie ?\'))" >supprimer</a>
+                   <a href="?action=modification&id='. $ligne['id'] .'"><button type="button" class="btn btn-primary"> Modifier </button></a>
+                   <a href="?action=suppression&id='. $ligne['id'] .'" onclick="return(confirm(\'Etes-vous sûr de vouloir de supprimer cette annonce ?\'))" ><button type="button" class="btn btn-danger">Supprimer</button></a>
                  </td>';
      $contenu .= '</tr>';
    }
@@ -125,6 +125,9 @@ if(!empty($_POST['id'])){
  <?php
  endif;
 
- require_once ('../inc/bas.inc.php');
-
+ if (internauteEstConnecteEtEstAdmin()) {
+   require_once ('bas.admin.inc.php');
+ } else {
+   require_once ('../inc/bas.inc.php');
+ }
   ?>

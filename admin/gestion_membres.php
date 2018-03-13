@@ -1,4 +1,4 @@
-<?php
+  <?php
 require_once('../inc/init.inc.php');
 
 if (!internauteEstConnecteEtEstAdmin()) {
@@ -10,7 +10,7 @@ if (!internauteEstConnecteEtEstAdmin()) {
  if (isset($_GET['action']) && $_GET['action'] == 'suppression' && isset($_GET['id'])) {
    $resultat = executeRequete("SELECT * FROM membre WHERE id = :id", array(':id' => $_GET['id'] ));
 
-   if ($resultat->rowCount() == 1) {
+   if ($resultat->rowCount() > 0) { //on a remplacé == 1 par > 0 20/02
      executeRequete("DELETE FROM membre WHERE id = :id", array(':id' => $_GET['id']));
 
      $contenu .= '<div class ="bg-success">Le membre a bien été supprimé ! </div>';
@@ -25,7 +25,7 @@ if (!internauteEstConnecteEtEstAdmin()) {
   if(!empty($_POST['id'])){
 
    executeRequete("REPLACE INTO membre (pseudo, mdp, nom, prenom, email, telephone, civilite, role, date_enregistrement) VALUES (:pseudo, :mdp, :nom, :prenom, :email, :telephone, :civilite, :role, NOW())", array(
-    // ':id'   => $_POST['id'],
+     ':id'   => $_POST['id'],
      ':mdp'=> $_POST['mdp'],
      ':pseudo'    => $_POST['pseudo'],
      ':nom'  => $_POST['nom'],
@@ -83,13 +83,11 @@ while ($ligne = $resultat->fetch(PDO::FETCH_ASSOC)) {
         $contenu .= '<td>'. $information .'</td>';
 
     }
-
-     $contenu .= '<td>
-                   <a href="?action=modification&id='. $ligne['id'] .'">modifier</a>
-                   /
-                   <a href="?action=suppression&id='. $ligne['id'] .'" onclick="return(confirm(\'Etes-vous sûr de vouloir de supprimer cette membre ?\'))" >supprimer</a>
-                 </td>';
-     $contenu .= '</tr>';
+    $contenu .= '<td>
+                  <a href="?action=modification&id='. $ligne['id'] .'"><button type="button" class="btn btn-primary"> Modifier </button></a>
+                  <a href="?action=suppression&id='. $ligne['id'] .'" onclick="return(confirm(\'Etes-vous sûr de vouloir de supprimer ce membre?\'))" ><button type="button" class="btn btn-danger">Supprimer</button></a>
+                </td>';
+    $contenu .= '</tr>';
    }
    $contenu .= '</table>';
 }

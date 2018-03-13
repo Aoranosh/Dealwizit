@@ -31,13 +31,14 @@ require_once('../inc/init.inc.php');
  if (!empty($_FILES['photo']['name'])) {
      //var_dump($_FILES);
      $nom_photo = $_POST['titre'] . '_' . $_FILES['photo']['name'];
-     $photo_bdd = RACINE_SITE . 'photo/' . $nom_photo;
-     $photo_physique = $_SERVER['DOCUMENT_ROOT'] . $photo_bdd;
+     $photo_bdd = 'dealwizit/photo/' . $nom_photo;
+     $photo_physique = $_SERVER['DOCUMENT_ROOT']. '/portfolio/' . $photo_bdd;
      copy($_FILES['photo']['tmp_name'], $photo_physique);
  }
 
 if(!empty($_POST['id'])){
  executeRequete("REPLACE INTO annonce (titre, description_courte, prix, photo, pays, ville, adresse, code_postal, membre_id, categorie_id, description_longue, date_enregistrement) VALUES (:titre, :description_courte, :prix, :photo, :pays, :ville, :adresse, :code_postal, :membre_id, :categorie_id, :description_longue,  NOW())", array(
+   //':id'   => $_SESSION['id'],
    ':titre'    => $_POST['titre'],
    ':description_courte'  => $_POST['description_courte'],
    ':prix'         => $_POST['prix'],
@@ -52,7 +53,6 @@ if(!empty($_POST['id'])){
    )
 );
 } else {
-
  executeRequete("INSERT INTO annonce (titre, description_courte, prix, photo, pays, ville, adresse, code_postal, membre_id, categorie_id, description_longue, date_enregistrement) VALUES (:titre, :description_courte, :prix, :photo, :pays, :ville, :adresse, :code_postal, :membre_id, :categorie_id, :description_longue,  NOW())", array(
    // ':id'   => $_POST['id'],
    ':titre'    => $_POST['titre'],
@@ -79,26 +79,31 @@ if(!empty($_POST['id'])){
 
  if (isset($_GET['action']) && $_GET['action'] == 'affichage') {
 
-   $resultat = executeRequete("SELECT * FROM annonce");
+   // $resultat = executeRequete("SELECT * FROM annonce");
+
+   $resultat = executeRequete("SELECT annonce.id, annonce.titre, annonce.description_courte, annonce.description_longue, annonce.prix, annonce.photo, annonce.pays, annonce.ville, annonce.adresse, annonce.code_postal, membre.prenom, categorie.titre AS categorie_titre, annonce.date_enregistrement FROM annonce, categorie, membre where annonce.categorie_id = categorie.id and membre.id = annonce.membre_id");
 
    $contenu .= 'Nombre d\'annonces dans la boutique : ' . $resultat->rowCount();
 
+   $contenu .= '<div class="table-responsive">';
    $contenu .= '<table class="table">';
      $contenu .= '<tr>';
-       $contenu .= '<th>id</th>';
-       $contenu .= '<th>titre</th>';
-       $contenu .= '<th>description courte</th>';
-       $contenu .= '<th>prix</th>';
-       $contenu .= '<th>photo</th>';
-       $contenu .= '<th>pays</th>';
-       $contenu .= '<th>ville</th>';
-       $contenu .= '<th>adresse</th>';
-       $contenu .= '<th>code postal</th>';
-       $contenu .= '<th>membre</th>';
-       $contenu .= '<th>catégorie</th>';
-       $contenu .= '<th>description longue</th>';
-       $contenu .= '<th>date enregistrement</th>';
-       $contenu .= '<th>actions</th>';
+       $contenu .= '<th>Id</th>';
+       $contenu .= '<th>Titre</th>';
+       $contenu .= '<th>Description courte</th>';
+       $contenu .= '<th>Description longue</th>';
+       $contenu .= '<th>Prix</th>';
+       $contenu .= '<th>Photo</th>';
+       $contenu .= '<th>Pays</th>';
+       $contenu .= '<th>Ville</th>';
+       $contenu .= '<th>Adresse</th>';
+       $contenu .= '<th>Code postal</th>';
+       $contenu .= '<th>Membre</th>';
+       $contenu .= '<th>Catégorie</th>';
+       $contenu .= '<th>Date enregistrement</th>';
+       if (internauteEstConnecteEtEstAdmin()) {
+          $contenu .= '<th>Actions</th>';
+       }
      $contenu .= '</tr>';
 
    while ($ligne = $resultat->fetch(PDO::FETCH_ASSOC)) {
@@ -107,24 +112,25 @@ if(!empty($_POST['id'])){
      $contenu .= '<tr>';
      foreach ($ligne as $indice => $information) {
        if ($indice == 'photo') {
-           $contenu .= '<td><img src ="'. $information .'" width="90" height="70"></td>';
+           $contenu .= '<td><img src ="/portfolio/'. $information .'" width="90" height="70"></td>';
        }else{
            $contenu .= '<td>'. $information .'</td>';
 
        }
 
      }
+     if (internauteEstConnecteEtEstAdmin()) {
      $contenu .= '<td>
-                   <a href="?action=modification&id='. $ligne['id'] .'">modifier</a>
-                   /
-                   <a href="?action=suppression&id='. $ligne['id'] .'" onclick="return(confirm(\'Etes-vous sûr de vouloir de supprimer cette annonce ?\'))" >supprimer</a>
+                   <a href="?action=modification&id='. $ligne['id'] .'"><button type="button" class="btn btn-primary"> Modifier </button></a>
+                   <a href="?action=suppression&id='. $ligne['id'] .'" onclick="return(confirm(\'Etes-vous sûr de vouloir de supprimer cette annonce ?\'))" ><button type="button" class="btn btn-danger">Supprimer</button></a>
                  </td>';
      $contenu .= '</tr>';
+    }
    }
 
    $contenu .= '</table>';
+   $contenu .= '</div>';
  }
-
 
  //affichage-----------------------------------------------------
 if (internauteEstConnecteEtEstAdmin()) {
@@ -135,10 +141,9 @@ if (internauteEstConnecteEtEstAdmin()) {
  echo '<ul class="nav nav-tabs">
        <li><a href="?action=affichage">Affichage d\'annonces</a></li>
        <li><a href="?action=ajout">Ajout d\'annonces</a></li>
-       <ul>';
+       </ul>';
 
  echo $contenu;
-
 
  if (isset($_GET['action']) && ($_GET['action'] == 'ajout' || $_GET['action'] == 'modification')) :
    $resultat = executeRequete("SELECT * FROM categorie");
@@ -147,7 +152,6 @@ if (internauteEstConnecteEtEstAdmin()) {
   while ($row = $resultat->fetch(PDO::FETCH_ASSOC)) {
       $toutescategories .= "<option value=\"" .$row['id']. "\" >" . $row['titre'] ."</option>\n";
   }
-
       $toutescategories .= '</select>';
 
  if (isset($_GET['id'])) {
@@ -168,7 +172,7 @@ if (internauteEstConnecteEtEstAdmin()) {
  <input type="text" id="titre" name="titre" value="<?php
  echo $annonce_actuel['titre'] ?? '';  ?>"><br><br>
 
- <label for="description_courte">description courte</label><br>
+ <label for="description_courte">Description courte</label><br>
  <input type="text" id="description_courte" name="description_courte" value="<?php
  echo $annonce_actuel['description_courte'] ?? '';  ?>"><br><br>
 
@@ -182,7 +186,7 @@ if (internauteEstConnecteEtEstAdmin()) {
  if (isset($annonce_actuel['photo'])) {
    echo '<i>Vous pouvez uploader une nouvelle photo</i>';
    echo '<p>Photo actuelle : </p>';
-   echo '<img src="'. $annonce_actuel['photo'] .'" width="90" height="90"><br>';
+   echo '<img src="/portfolio/'. $annonce_actuel['photo'] .'" width="90" height="90"><br>';
    echo '<input type="hidden" name="photo_actuelle" value="'. $annonce_actuel['photo'] .'">';
 
  }
@@ -201,7 +205,7 @@ if (internauteEstConnecteEtEstAdmin()) {
  <input type="text" id="adresse" name="adresse" value="<?php
  echo $annonce_actuel['adresse'] ?? '';  ?>"><br><br>
 
- <label for="code_postal">code postal</label><br>
+ <label for="code_postal">Code postal</label><br>
  <input type="text" id="code_postal" name="code_postal" value="<?php
  echo $annonce_actuel['code_postal'] ?? '';  ?>"><br><br>
 
@@ -216,7 +220,7 @@ if (internauteEstConnecteEtEstAdmin()) {
  <!-- <input type="text" id="categorie_id" name="categorie_id" value="<?php
  //echo $annonce_actuel['categorie_id'] ?? '';  ?>"><br><br> -->
 
- <label for="description_longue">description longue</label><br>
+ <label for="description_longue">Description longue</label><br>
  <input type="text" id="description_longue" name="description_longue" value="<?php
  echo $annonce_actuel['description_longue'] ?? '';  ?>"><br><br>
 
@@ -227,6 +231,9 @@ if (internauteEstConnecteEtEstAdmin()) {
  <?php
  endif;
 
- require_once ('../inc/bas.inc.php');
-
+ if (internauteEstConnecteEtEstAdmin()) {
+   require_once ('bas.admin.inc.php');
+ } else {
+   require_once ('../inc/bas.inc.php');
+ }
   ?>
