@@ -4,7 +4,7 @@
 // $pdo = new PDO('mysql:host=localhost;dbname=dealwizit', 'root', '', array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
 
 try {
-  $pdo = new PDO('mysql:host=localhost;dbname=dealwizit', 'root', '', array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
+  $pdo = new PDO('mysql:host=serflex.o2switch.net;dbname=aoranosh_dealwizit', 'aoranosh', '_+XJPdXAA0Hp', array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
   //il faut changer le localhost, le dbname, l'id, le mdp
     // return$pdo;
 } catch (PDOException $e) {
@@ -20,7 +20,7 @@ try {
 session_start();
 
 //Définition du chemin du site :
-define('RACINE_SITE', '/dealwizit/'); //indiquer le dossier dans lequel ce trouve le site sans "localhost"
+define('RACINE_SITE', '/portfolio/dealwizit/'); //indiquer le dossier dans lequel ce trouve le site sans "localhost"
 //changer la racine du fichier
 // Initialisation des variables d'affichage :
 
