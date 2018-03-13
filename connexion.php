@@ -10,7 +10,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'deconnexion'){
 
 //3- cas de l'internaute deja connecté : on le renvoie vers son profil:
 if (internauteEstConnecte()) {
-  header('location:profil.php');//on redirige l'internaute vers son profil s'il est déjà connecté
+  header('location:/portfolio/dealwizit/profil.php');//on redirige l'internaute vers son profil s'il est déjà connecté
   exit();
 }
 
@@ -40,11 +40,11 @@ if (!empty($_POST)) {
         //si il y a une ligne dans le resultat de la requete, alors le pseudo et le mdp existent et correspondent
         $membre = $resultat->fetch(PDO::FETCH_ASSOC);
         //pas de boucle while car on est sur qu'il n'y a qu'un seul résultat
-        var_dump($membre);
+        //var_dump($membre);
 
         $_SESSION['membre'] = $membre; //nous créons une session avec toutes les infos du membre
         //var_dump($_SESSION);
-        header('location:profil.php'); //le membre étant connecté on l'envoie vers son profil
+        header('location:/portfolio/dealwizit/profil.php'); //le membre étant connecté on l'envoie vers son profil
         exit(); //pour quitter ce script
     }else{
       $contenu .= '<div class="bg-danger">Erreur sur les identifiants.</div>';

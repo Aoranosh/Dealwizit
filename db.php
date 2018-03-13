@@ -6,13 +6,13 @@
 
 $con = MySQLi_connect(
 
-   "localhost", //Server host name.
+   "serflex.o2switch.net", //Server host name.
 
-   "root", //Database username.
+   "aoranosh", //Database username.
 
-   "", //Database password.
+   "_+XJPdXAA0Hp", //Database password.
 
-   "dealwizit" //Database name or anything you would like to call it.
+   "aoranosh_dealwizit" //Database name or anything you would like to call it.
 
 );
 

@@ -37,20 +37,16 @@ if(!empty($_POST)) {
   //on utilise un filtre de variable
   if (!isset($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
     $contenu .='<div class="bg-danger">L\'email est incorrect ! </div>';
-  }//filer_var() permet de valider des formats de variables, ici qu'il s'agit d'un email
-  //retourne true si exact, retourne false dans le cas contraire
-
-//Si pas d'erreur dans le formulaire on vérifié l'unicité du pseudo puis on l'insert en BDD :
+  }
 if (empty($contenu)) {
-  //si la variable est vide, c'est qu'il n'y a pas de message d'erreur, on fait donc un select pour vérif le pseudo
+
   $membre = executeRequete("SELECT * FROM membre WHERE pseudo =:pseudo",array(':pseudo'=> $_POST['pseudo']));
 
   if($membre->rowCount() > 0){
-    //si la requête retourne 1 ou plusieurs lignes, c'est que le pseudo est deja en BDD
-    //on demande donc d'en choisir un autre:
+
     $contenu .= '<div class="bg-danger">Le pseudo est indisponible. Veuillez en choisir un autre. </div>';
   }else {
-    $_POST['mdp'] = sha1($_POST['mdp']); // Si on encrypte un MDP avec cette fonction, il faudra également le faire sur la page de connexion pour comparer 2 MDP cryptés
+    $_POST['mdp'] = md5($_POST['mdp']); // Si on encrypte un MDP avec cette fonction, il faudra également le faire sur la page de connexion pour comparer 2 MDP cryptés
   //  echo'<pre>'; var_dump($_POST['mdp']); echo'</pre>';
 
     executeRequete("INSERT INTO membre (pseudo, mdp, nom, prenom, telephone, email, civilite, role, date_enregistrement) VALUES(:pseudo, :mdp, :nom, :prenom, :telephone, :email, :civilite, 'user', NOW())",
@@ -61,7 +57,7 @@ if (empty($contenu)) {
     ':telephone'=> $_POST['telephone'],
     ':email'=> $_POST['email'],
     ':civilite'=> $_POST['civilite']));
-var_dump($_POST);
+    //var_dump($_POST);
   $contenu .= '<div class="bg-success">Vous êtes inscrit.<a href="connexion.php">Cliquez pour vous connecter</a></div>';
 
   }
